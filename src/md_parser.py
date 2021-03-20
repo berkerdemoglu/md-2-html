@@ -30,10 +30,9 @@ class Parser():
 			self.advance()
 			self.make_tag()
 
-
 	def make_tag(self):
 		"""Make tag from one line."""
-		while self.current_char != None:
+		while self.current_char is not None:
 			if self.current_char == '#': # If header
 				self.html.add(self.make_heading())
 			elif self.current_char == '*':
@@ -62,6 +61,11 @@ class Parser():
 			self.advance()
 
 		tag = 'h' + str(hash_count)
+		if content[0] == ' ': # Remove unnecessary space if it exists
+			content = content[1:len(content) - 1]
+
+		content = content.replace('\n', '')
+
 		return HtmlTag(tag, content)
 
 	def make_bold_italic(self):
@@ -84,17 +88,19 @@ class Parser():
 			right_star_count += 1
 			self.advance()
 
+		# Remove first blank space if it exists.
+		content = content[1:] if content[0] == ' ' else content
+
 		if left_star_count == right_star_count:
-			if left_star_count == 1: # italic
+			if left_star_count == 1:  # italic
 				return HtmlTag('i', content)
-			elif left_star_count == 2: # bold
+			elif left_star_count == 2:  # bold
 				return HtmlTag('b', content)
 			else:
-				if left_star_count % 2 == 0: # if bold bold e.g 4 asterisks
+				if left_star_count % 2 == 0:  # if bold bold e.g 4 asterisks
 					return HtmlTag('b', content)
 				else: # if bold-italic
-					italic = HtmlTag('i')
-					italic.add(HtmlTag('b', content))
+					italic = HtmlTag('i', str(HtmlTag('b', content)))
 					return italic
 		else:
 			return HtmlTag('lol')

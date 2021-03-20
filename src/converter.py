@@ -12,7 +12,7 @@ class MD2HTMLConverter():
 
     def convert(self):
         self.parser.make_tags()
-        with open('../out/' + self.html_filename, 'w') as f:
+        with open(self.html_filename, 'w') as f:
             f.write('<!DOCTYPE html>\n')
             f.write(str(self.parser.html))
 
