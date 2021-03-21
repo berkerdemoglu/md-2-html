@@ -1,6 +1,7 @@
 from html_tag import HtmlTag, VoidHtmlTag
 import exceptions as err
 
+
 class Parser():
 	"""A class that both parses and lexes the markdown file."""
 
@@ -9,7 +10,9 @@ class Parser():
 		with open(filename, 'r') as f:
 			self.lines = f.readlines()
 
-		self.html = HtmlTag('html')
+		# Create the html and the main div tag.
+		self.html = HtmlTag('html', attributes={'lang': 'en-CA'})
+		self.div = HtmlTag('div', attributes={'class': 'main'})
 
 		self.line = None
 		self.pos = -1
@@ -34,11 +37,11 @@ class Parser():
 		"""Make tag from one line."""
 		while self.current_char is not None:
 			if self.current_char == '#': # If header
-				self.html.add(self.make_heading())
+				self.div.add(self.make_heading())
 			elif self.current_char == '*':
 				p_tag = HtmlTag('p')
 				p_tag.add(self.make_bold_italic())
-				self.html.add(p_tag)
+				self.div.add(p_tag)
 			else:
 				self.advance()
 
@@ -70,8 +73,6 @@ class Parser():
 
 	def make_bold_italic(self):
 		"""Make either a bold tag, italic tag or both. todo add non-tag asterisks"""
-		left_non_content = "" # asterisks to the left that don't belong in the tag
-		right_non_content = "" # asterisks to the right that don't belong in the tag
 
 		left_star_count = 0 # Keep track of asterisks
 		content = ""  # Store the content of the bold/italic text
@@ -99,8 +100,11 @@ class Parser():
 			else:
 				if left_star_count % 2 == 0:  # if bold bold e.g 4 asterisks
 					return HtmlTag('b', content)
-				else: # if bold-italic
+				else:  # if bold and italic
 					italic = HtmlTag('i', str(HtmlTag('b', content)))
 					return italic
-		else:
-			return HtmlTag('lol')
+		elif left_star_count > right_star_count:  # add asterisks to the left
+			star_difference = left_star_count - right_star_count
+			content = (star_difference * '*') + content
+			if right_star_count % 2 == 0:  # if bold
+				return HtmlTag('b', content)
