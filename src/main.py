@@ -3,8 +3,9 @@ from converter import MD2HTMLConverter
 
 def main():
     filename = "../resources/document.md"
-    converter = MD2HTMLConverter(filename)
-    converter.convert()
+    with MD2HTMLConverter(filename) as converter:
+        print(converter.parser.html)
+
 
 
 if __name__ == '__main__':

@@ -59,7 +59,9 @@ class MD2HTMLConverter():
 		with open(self.html_filename, 'w') as f:
 			f.write(str(self.parser.html))
 
-		print(self.parser.html)
+	def __enter__(self):
+		self.convert()
 
-		# os.chdir('..')
-		# webbrowser.open('file:///' + os.getcwd() + '/resources/document.html')
+	def __exit__(self, exc_type, exc_val, exc_tb):
+		os.chdir('..')
+		webbrowser.open('file:///' + os.getcwd() + '/resources/document.html')
