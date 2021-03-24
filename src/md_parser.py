@@ -12,7 +12,7 @@ class Parser():
 
 		# Create the html and the main div tag.
 		self.html = HtmlTag('html', attributes={'lang': 'en-CA'})
-		self.div = HtmlTag('div', attributes={'class': 'main'})
+		self.div = HtmlTag('div', attributes={'class': 'main container'})
 
 		self.line = None
 		self.pos = -1
