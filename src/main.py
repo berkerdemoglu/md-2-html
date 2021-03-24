@@ -7,6 +7,5 @@ def main():
         print(converter.parser.html)
 
 
-
 if __name__ == '__main__':
     main()

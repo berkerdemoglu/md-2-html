@@ -5,7 +5,7 @@ import exceptions as err
 class Parser():
 	"""A class that both parses and lexes the markdown file."""
 
-	def __init__(self, filename):
+	def __init__(self, filename: str):
 		"""Read the file content and initialize position and <html> tag."""
 		with open(filename, 'r') as f:
 			self.lines = f.readlines()
@@ -18,7 +18,6 @@ class Parser():
 		self.pos = -1
 		self.current_char = None
 
-	### LEXER ###
 	def advance(self):
 		"""Increment the character position by 1."""
 		self.pos += 1
@@ -27,7 +26,7 @@ class Parser():
 	def make_tags(self):
 		"""Make html tags."""
 		for line in self.lines:
-			self.line = line
+			self.line = line.replace('\n', '')
 			self.pos = -1
 			self.current_char = None
 			self.advance()
@@ -39,9 +38,7 @@ class Parser():
 			if self.current_char == '#': # If header
 				self.div.add(self.make_heading())
 			elif self.current_char == '*':
-				p_tag = HtmlTag('p')
-				p_tag.add(self.make_bold_italic())
-				self.div.add(p_tag)
+				self.div.add(self.make_bold_italic())
 			else:
 				self.advance()
 
