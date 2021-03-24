@@ -61,12 +61,7 @@ class VoidHtmlTag(HtmlTag):
 		return repr(self)
 
 	def __repr__(self):
-		if self.tag == 'html':
-			unformatted_html = '<!DOCTYPE html>'
-		else:
-			unformatted_html = ""
-
-		unformatted_html += '<' + self.tag
+		unformatted_html = '<' + self.tag
 		# Add the attributes.
 		if self.attributes:
 			for attribute, value in self.attributes.items():
