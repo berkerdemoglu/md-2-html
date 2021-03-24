@@ -19,14 +19,8 @@ class MD2HTMLConverter():
 	@staticmethod
 	def _generate_css():
 		"""Generates CSS styling for the generated .html file."""
-		css_content = ""
-		# Read css from the styles file.
-		with open('styles.css', 'r') as style_f:
-			for line in style_f.readlines():
-				css_content += line
-
-		# Generates style tag with CSS.
-		css = HtmlTag('style', attributes={'type': 'text/css'}, content=css_content)
+		bootstrap = "https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css"
+		css = HtmlTag('link', attributes={'rel': 'stylesheet', 'href': bootstrap})
 		return css
 
 	@private
