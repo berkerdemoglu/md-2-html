@@ -2,7 +2,7 @@ from md_parser import Parser
 from html_tag import HtmlTag, VoidHtmlTag
 import webbrowser
 import os
-from accessify import private  # todo might remove access modifier
+from accessify import private
 
 
 class MD2HTMLConverter():
@@ -12,6 +12,8 @@ class MD2HTMLConverter():
 		"""Initialize the converter with a file."""
 		self.filename = filename
 		self.html_filename = filename.replace('.md', '.html')
+
+		self.open_browser = open_browser
 
 		self.parser = Parser(filename)
 
@@ -38,7 +40,6 @@ class MD2HTMLConverter():
 		style_tags = self._generate_css()
 		head.add(style_tags[0])
 		head.add(style_tags[1])
-		head.add(HtmlTag('title', 'New Html File'))
 
 		self.parser.html.add(head)
 
@@ -62,5 +63,6 @@ class MD2HTMLConverter():
 		return self
 
 	def __exit__(self, exc_type, exc_val, exc_tb):
-		os.chdir('..')
-		webbrowser.open('file:///' + os.getcwd() + '/resources/document.html')
+		if self.open_browser:
+			os.chdir('..')
+			webbrowser.open('file:///' + os.getcwd() + '/resources/document.html')

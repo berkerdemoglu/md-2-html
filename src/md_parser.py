@@ -33,12 +33,16 @@ class Parser():
 			self.make_tag()
 
 	def make_tag(self):
-		"""Make tag from one line."""
+		"""Make tag from one line"""
 		while self.current_char is not None:
-			if self.current_char == '#': # If header
+			if self.current_char == '#':
 				self.div.add(self.make_heading())
 			elif self.current_char == '*':
 				self.div.add(self.make_bold_italic())
+			elif self.current_char == '[':
+				self.div.add(self.make_link())
+			elif self.current_char == '!':
+				self.div.add(self.make_image())
 			else:
 				self.advance()
 
@@ -69,7 +73,7 @@ class Parser():
 		return HtmlTag(tag, content, attributes={'class': tag})  # class='h1' for example
 
 	def make_bold_italic(self):
-		"""Make either a bold tag, italic tag or both. todo add non-tag asterisks"""
+		"""Make either a bold tag, italic tag or both"""
 
 		left_star_count = 0  # Keep track of asterisks
 		content = ""  # Store the content of the bold/italic text
@@ -94,14 +98,60 @@ class Parser():
 				return HtmlTag('i', content)
 			elif left_star_count == 2:  # bold
 				return HtmlTag('b', content)
-			else:
-				if left_star_count % 2 == 0:  # if bold bold e.g 4 asterisks
-					return HtmlTag('b', content)
-				else:  # if bold and italic
-					italic = HtmlTag('i', str(HtmlTag('b', content)))
-					return italic
+			else:  # if bold and italic, wrap bold tag in italic tag
+				italic = HtmlTag('i', str(HtmlTag('b', content)))
+				return italic
 		elif left_star_count > right_star_count:  # add asterisks to the left
 			star_difference = left_star_count - right_star_count
 			content = (star_difference * '*') + content
 			if right_star_count % 2 == 0:  # if bold
 				return HtmlTag('b', content)
+			else:  # if italic
+				return HtmlTag('i', content)
+
+		else:  # add asterisks to the right
+			star_difference = right_star_count - left_star_count
+			content = (star_difference * '*') + content
+			if right_star_count % 2 == 0:  # if bold
+				return HtmlTag('b', content)
+			else:  # if italic
+				return HtmlTag('i', content)
+
+	def make_link(self):
+		"""Makes a link, <a> tag."""
+		link_text = ""  # create an empty string to store the link text
+		self.advance()
+		while self.current_char != ']':  # while parsing link text
+			link_text += self.current_char
+			self.advance()
+
+		self.advance()
+
+		ref_link = ""  # create an empty string to store the link
+		if self.current_char == '(':  # a link is about to be parsed
+			self.advance()
+			while self.current_char != ')':
+				ref_link += self.current_char
+				self.advance()
+
+		return HtmlTag('a', link_text, attributes={'href': ref_link})
+
+	def make_image(self):
+		"""Makes an image, <img> tag."""
+		alt_text = ""  # create an empty string to store the link text
+		self.advance()
+		self.advance()
+		while self.current_char != ']':  # while parsing link text
+			alt_text += self.current_char
+			self.advance()
+
+		self.advance()
+
+		img_link = ""  # create an empty string to store the link
+		if self.current_char == '(':  # a link is about to be parsed
+			self.advance()
+			while self.current_char != ')':
+				img_link += self.current_char
+				self.advance()
+
+		return VoidHtmlTag('img', attributes={'alt': alt_text, 'src': img_link})
