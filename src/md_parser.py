@@ -66,12 +66,12 @@ class Parser():
 
 		content = content.replace('\n', '')
 
-		return HtmlTag(tag, content)
+		return HtmlTag(tag, content, attributes={'class': tag})  # class='h1' for example
 
 	def make_bold_italic(self):
 		"""Make either a bold tag, italic tag or both. todo add non-tag asterisks"""
 
-		left_star_count = 0 # Keep track of asterisks
+		left_star_count = 0  # Keep track of asterisks
 		content = ""  # Store the content of the bold/italic text
 		while self.current_char is not None and self.current_char == '*':
 			left_star_count += 1

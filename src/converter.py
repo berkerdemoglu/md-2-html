@@ -20,8 +20,10 @@ class MD2HTMLConverter():
 	def _generate_css():
 		"""Generates CSS styling for the generated .html file."""
 		bootstrap = "https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css"
-		css = HtmlTag('link', attributes={'rel': 'stylesheet', 'href': bootstrap})
-		return css
+		css_bootstrap = VoidHtmlTag('link', attributes={'rel': 'stylesheet', 'href': bootstrap})
+		css_styles = VoidHtmlTag('link', attributes={'rel': 'stylesheet', 'href': '../assets/styles.css'})
+
+		return css_bootstrap, css_styles
 
 	@private
 	def _generate_head(self):
@@ -33,7 +35,10 @@ class MD2HTMLConverter():
 		head.add(
 			VoidHtmlTag('meta', attributes={'name': 'viewport', 'content': 'width=device-width, initial-scale=1.0'}))
 		# Add CSS and title.
-		head.add(self._generate_css())
+		style_tags = self._generate_css()
+		head.add(style_tags[0])
+		head.add(style_tags[1])
+		head.add(HtmlTag('title', 'New Html File'))
 
 		self.parser.html.add(head)
 
