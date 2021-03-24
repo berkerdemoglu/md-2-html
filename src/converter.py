@@ -23,7 +23,8 @@ class MD2HTMLConverter():
 		"""Generates CSS styling for the generated .html file."""
 		bootstrap = "https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css"
 		css_bootstrap = VoidHtmlTag('link', attributes={'rel': 'stylesheet', 'href': bootstrap})
-		css_styles = VoidHtmlTag('link', attributes={'rel': 'stylesheet', 'href': '../assets/styles.css'})
+		styles = "https://raw.githubusercontent.com/berkerdemoglu/md-2-html/8b633681436f0cff0a4898f625296443c749ae6d/assets/styles.css"
+		css_styles = VoidHtmlTag('link', attributes={'rel': 'stylesheet', 'href': styles})
 
 		return css_bootstrap, css_styles
 
