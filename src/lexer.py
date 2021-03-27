@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Tuple
 from enum import Enum
 
 
@@ -13,16 +13,20 @@ class TokenType(Enum):
 	T_H5 = 'T_H5'
 	T_H6 = 'T_H6'
 
+	T_TEXT = 'T_TEXT'  # token type for any type of string
+
+	T_LINKTEXT = 'T_LINKTEXT'  # token type for text inside a link
+	T_HREF = 'T_HREF'  # token type for href attribute of a link
+
+	T_IMG_ALTTEXT = 'T_IMG_ALTTEXT'  # token type for alt attribute of an image
+	T_SRC = 'T_SRC'  # token type for source for src attribute of an image
+
+	# All other token types.
 	T_UNDERSCORE = '_'
 	T_DASH = '-'
-	T_LBRACKET = '['
-	T_RBRACKET = ']'
-	T_LPAREN = '('
-	T_RPAREN = ')'
 	T_EXCLAM = '!'
 	T_ASTRK = '*'
 	T_NEWLINE = '\n'
-	T_TEXT = ""  # empty string for placeholder
 
 
 class Token():
@@ -44,11 +48,13 @@ class Position():
 	"""A class that stores the current position being tokenized."""
 
 	def __init__(self, idx: int, ln: int, col: int):
+		"""Initialize the character index, line and column number."""
 		self.idx = idx
 		self.ln = ln
 		self.col = col
 
 	def advance(self, current_char: str) -> None:
+		"""Increment the position."""
 		self.idx += 1
 		self.col += 1
 
@@ -91,25 +97,16 @@ class Lexer():
 				self.tokens.append(Token(TokenType.T_DASH))
 				self.advance()
 			elif self.current_char == '[':
-				self.tokens.append(Token(TokenType.T_LBRACKET))
-				self.advance()
-			elif self.current_char == ']':
-				self.tokens.append(Token(TokenType.T_RBRACKET))
-				self.advance()
-			elif self.current_char == '(':
-				self.tokens.append(Token(TokenType.T_LPAREN))
-				self.advance()
-			elif self.current_char == ')':
-				self.tokens.append(Token(TokenType.T_RPAREN))
-				self.advance()
+				link_text, url = self._make_link()
+				self.tokens.append(link_text)
+				self.tokens.append(url)
 			elif self.current_char == '!':
-				self.tokens.append(Token(TokenType.T_EXCLAM))
+				alt_text, image_link = self._make_image()
+				self.tokens.append(alt_text)
+				self.tokens.append(image_link)
 				self.advance()
 			elif self.current_char == '*':
 				self.tokens.append(Token(TokenType.T_ASTRK))
-				self.advance()
-			elif self.current_char == '\n':
-				self.tokens.append(Token(TokenType.T_NEWLINE))
 				self.advance()
 			elif self.current_char in Lexer.TEXT_CHARS:
 				text_tok = self._make_text()
@@ -143,3 +140,46 @@ class Lexer():
 			self.advance()
 
 		return Token(TokenType.T_TEXT, text.strip())
+
+	def _make_link(self) -> Tuple[Token, Token]:
+		"""Returns two tokens, one consisting of the link text and one consisting of the URL."""
+		# Read the link text.
+		link_text = ""
+		self.advance()  # skip [ character
+		while self.current_char != ']':
+			link_text += self.current_char
+			self.advance()
+
+		# Skip [ and ) characters.
+		self.advance()
+		self.advance()
+
+		# Read the URL.
+		url = ""
+		while self.current_char != ')':
+			url += self.current_char
+			self.advance()
+
+		return Token(TokenType.T_LINKTEXT, link_text), Token(TokenType.T_HREF, url)
+
+	def _make_image(self) -> Tuple[Token, Token]:
+		# Read the link text.
+		alt_text = ""
+		# Skip ! and [ characters.
+		self.advance()
+		self.advance()
+		while self.current_char != ']':
+			alt_text += self.current_char
+			self.advance()
+
+		# Skip [ and ) characters.
+		self.advance()
+		self.advance()
+
+		# Read the URL.
+		image_link = ""
+		while self.current_char != ')':
+			image_link += self.current_char
+			self.advance()
+
+		return Token(TokenType.T_IMG_ALTTEXT, alt_text), Token(TokenType.T_SRC, image_link)
