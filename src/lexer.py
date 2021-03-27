@@ -41,7 +41,7 @@ class Token():
 
 # Lexer
 class Position():
-	"""A class that stores the current position."""
+	"""A class that stores the current position being tokenized."""
 
 	def __init__(self, idx: int, ln: int, col: int):
 		self.idx = idx
@@ -56,6 +56,7 @@ class Position():
 			self.ln += 1
 			self.col = 0
 
+
 class Lexer():
 	"""A class that creates tokens from a .md file."""
 	LETTERS = 'abcdefghijklmnopqrstuvxyz'
@@ -68,21 +69,22 @@ class Lexer():
 		self.tokens = []
 
 		with open(filename, 'r') as f:
-			self.file_content = f.read()
+			self.file_content = f.read().strip()
 
 		self.pos = Position(-1, 0, 1)
 		self.current_char = ""
 
+		self.advance()  # so we get to the first letter
+
 	def advance(self) -> None:
 		"""Increment the position and get a new character."""
 		self.pos.advance(self.current_char)
-		self.current_char = self.file_content[self.pos.idx] if self.pos.idx < len(self.file_content) else None
+		self.current_char = self.file_content[self.pos.idx] if self.pos.idx < len(self.file_content) else ""
 
 	def make_tokens(self) -> List[Token]:
 		"""Tokenize the file and return a list of tokens."""
-		while self.current_char is not None:
-			# TODO to check or not to check tab character or space?
-			# TODO check if letter and create a text token
+		while self.current_char != "":
+			# TODO: to check or not to check tab character or space?
 			if self.current_char == '#':
 				self.tokens.append(self._make_heading())
 			elif self.current_char == '-':
