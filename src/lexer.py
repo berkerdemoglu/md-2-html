@@ -5,7 +5,14 @@ from enum import Enum
 # TOKENS
 class TokenType(Enum):
 	"""A class that has variables that distinguish a token type."""
-	T_HASH = '#'
+	# Heading Tokens
+	T_H1 = 'T_H1'
+	T_H2 = 'T_H2'
+	T_H3 = 'T_H3'
+	T_H4 = 'T_H4'
+	T_H5 = 'T_H5'
+	T_H6 = 'T_H6'
+
 	T_UNDERSCORE = '_'
 	T_DASH = '-'
 	T_LBRACKET = '['
@@ -14,6 +21,7 @@ class TokenType(Enum):
 	T_RPAREN = ')'
 	T_EXCLAM = '!'
 	T_ASTRK = '*'
+	T_NEWLINE = '\n'
 	T_TEXT = ""  # empty string for placeholder
 
 
@@ -76,8 +84,7 @@ class Lexer():
 			# TODO to check or not to check tab character or space?
 			# TODO check if letter and create a text token
 			if self.current_char == '#':
-				self.tokens.append(Token(TokenType.T_HASH))
-				self.advance()
+				self.tokens.append(self._make_heading())
 			elif self.current_char == '-':
 				self.tokens.append(Token(TokenType.T_DASH))
 				self.advance()
@@ -99,17 +106,36 @@ class Lexer():
 			elif self.current_char == '*':
 				self.tokens.append(Token(TokenType.T_ASTRK))
 				self.advance()
+			elif self.current_char == '\n':
+				self.tokens.append(Token(TokenType.T_NEWLINE))
+				self.advance()
 			elif self.current_char in Lexer.TEXT_CHARS:
-				self.tokens.append(self._make_text())
+				text_tok = self._make_text()
+				if text_tok.value:
+					self.tokens.append(text_tok)
 			else:
 				self.advance()
 
 		return self.tokens
 
-	def _make_text(self) -> Token:
-		"""Returns a token of text."""
-		text = ""  # Create an empty string to store characters
+	def _make_heading(self) -> Token:
+		"""Returns a heading token (h1, h2 etc.)."""
+		hash_tag_count = 0  # keeps track of hash tags.
+		while self.current_char == '#' and hash_tag_count != 6:
+			hash_tag_count += 1
+			self.advance()
+		token_type = TokenType['T_H' + str(hash_tag_count)]  # determine heading tag
 
+		heading_text = ""
+		while self.current_char != '\n':  # while still parsing the same line as the heading
+			heading_text += self.current_char
+			self.advance()
+
+		return Token(token_type, heading_text.strip())  # strip unnecessary spaces
+
+	def _make_text(self) -> Token:
+		"""Returns a text token with the value of the token being the content of the text."""
+		text = ""  # Create an empty string to store characters
 		while self.current_char in Lexer.TEXT_CHARS:
 			text += self.current_char
 			self.advance()

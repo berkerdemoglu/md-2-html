@@ -15,4 +15,5 @@ class Parser():
 
 	def parse(self):
 		# todo, not implemented yet
-		pass
+		for token in self.tokens:
+			print(str(token))
