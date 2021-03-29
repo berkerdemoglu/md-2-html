@@ -1,5 +1,5 @@
 from __future__ import annotations
-import html5print
+from html5print import HTMLBeautifier
 
 
 class HtmlTag():
@@ -46,7 +46,7 @@ class HtmlTag():
 		# Close the tag.
 		unformatted_html += f'</{self.tag}>'
 
-		representation = html5print.HTMLBeautifier.beautify(unformatted_html, indent=4)
+		representation = HTMLBeautifier.beautify(unformatted_html, indent=4)
 
 		return representation
 
