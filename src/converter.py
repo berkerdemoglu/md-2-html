@@ -3,6 +3,8 @@ from html_tag import HtmlTag, VoidHtmlTag
 import webbrowser
 import os
 
+from typing import NoReturn, Tuple
+
 
 class MD2HTMLConverter():
 	"""A class that converts markdown files to HTML5."""
@@ -17,7 +19,7 @@ class MD2HTMLConverter():
 		self.parser = Parser(filename)
 
 	@staticmethod
-	def _generate_css():
+	def _generate_css() -> Tuple[VoidHtmlTag, VoidHtmlTag]:
 		"""Generates CSS styling for the generated .html file."""
 		bootstrap = "https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css"
 		css_bootstrap = VoidHtmlTag('link', attributes={'rel': 'stylesheet', 'href': bootstrap})
@@ -26,7 +28,7 @@ class MD2HTMLConverter():
 
 		return css_bootstrap, css_styles
 
-	def _generate_head(self):
+	def _generate_head(self) -> NoReturn:
 		"""Generates the head tag."""
 		head = HtmlTag('head')
 		# Add meta tags.
@@ -41,14 +43,14 @@ class MD2HTMLConverter():
 
 		self.parser.html.add(head)
 
-	def _generate_body(self):
+	def _generate_body(self) -> NoReturn:
 		"""Creates body and the main div."""
 		body = HtmlTag('body')
 		body.add(self.parser.div)
 
 		self.parser.html.add(body)
 
-	def convert(self):
+	def convert(self) -> NoReturn:
 		"""Parses markdown and outputs in the form of an .html file."""
 		self._generate_head()
 		self._generate_body()
