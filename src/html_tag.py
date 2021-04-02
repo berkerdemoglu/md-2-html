@@ -1,6 +1,8 @@
 from __future__ import annotations
 from html5print import HTMLBeautifier
 
+from typing import NoReturn
+
 
 class HtmlTag():
 
@@ -19,7 +21,7 @@ class HtmlTag():
 		else:
 			self.attributes = attributes
 
-	def add(self, tag: HtmlTag):
+	def add(self, tag: HtmlTag) -> NoReturn:
 		self.child_nodes.append(tag)
 
 	def __str__(self):
