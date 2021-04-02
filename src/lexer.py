@@ -1,4 +1,4 @@
-from typing import List, Tuple
+from typing import List, Tuple, NoReturn
 from enum import Enum
 
 
@@ -13,17 +13,20 @@ class TokenType(Enum):
 	T_H5 = 'T_H5'
 	T_H6 = 'T_H6'
 
-	T_TEXT = 'T_TEXT'  # token type for any type of string
+	T_TEXT = 'T_TEXT'  # for any type of string
 
-	T_LINKTEXT = 'T_LINKTEXT'  # token type for text inside a link
-	T_HREF = 'T_HREF'  # token type for href attribute of a link
+	T_LINKTEXT = 'T_LINKTEXT'  # for text inside a link
+	T_HREF = 'T_HREF'  # for href attribute of a link
 
-	T_IMG_ALTTEXT = 'T_IMG_ALTTEXT'  # token type for alt attribute of an image
-	T_SRC = 'T_SRC'  # token type for source for src attribute of an image
+	T_IMG_ALTTEXT = 'T_IMG_ALTTEXT'  # for alt attribute of an image
+	T_SRC = 'T_SRC'  # for source for src attribute of an image
+
+	T_INLINE_CODE = 'T_INLINE_CODE'  # for inline code like `foo`
+
+	T_HR = 'T_HR'  # for horizontal rule
 
 	# All other token types.
 	T_UNDERSCORE = '_'
-	T_DASH = '-'
 	T_EXCLAM = '!'
 	T_ASTRK = '*'
 	T_NEWLINE = '\n'
@@ -37,10 +40,10 @@ class Token():
 		self.value = value
 
 	def __repr__(self):
-		return f'token_type={self.token_type}, value={str(self.value)}'
+		return f'token_type={self.token_type.name}, value={str(self.value)}'
 
 	def __str__(self):
-		return f'({self.token_type})' if self.value is None else f'({self.token_type}:{self.value})'
+		return f'({self.token_type.name})' if self.value is None else f'({self.token_type.name}:{self.value})'
 
 
 # Lexer
@@ -53,7 +56,7 @@ class Position():
 		self.ln = ln
 		self.col = col
 
-	def advance(self, current_char: str) -> None:
+	def advance(self, current_char: str) -> NoReturn:
 		"""Increment the position."""
 		self.idx += 1
 		self.col += 1
@@ -75,17 +78,20 @@ class Lexer():
 		self.tokens = []
 
 		with open(filename, 'r') as f:
-			self.file_content = f.read().strip()
+			self.file_content = f.read().rstrip() + "\n"  # read the file add a new line to avoid errors in lexing
 
+		# Initialize position to be tokenized and a flag for checking new line.
 		self.pos = Position(-1, 0, 1)
 		self.current_char = ""
+		self.not_newline = True
 
 		self.advance()  # so we get to the first letter
 
-	def advance(self) -> None:
+	def advance(self) -> NoReturn:
 		"""Increment the position and get a new character."""
 		self.pos.advance(self.current_char)
 		self.current_char = self.file_content[self.pos.idx] if self.pos.idx < len(self.file_content) else ""
+		self.not_newline = self.current_char != '\n'
 
 	def make_tokens(self) -> List[Token]:
 		"""Tokenize the file and return a list of tokens."""
@@ -93,8 +99,8 @@ class Lexer():
 			# TODO: to check or not to check tab character or space?
 			if self.current_char == '#':
 				self.tokens.append(self._make_heading())
-			elif self.current_char == '-':
-				self.tokens.append(Token(TokenType.T_DASH))
+			elif self.current_char == '*':
+				self.tokens.append(Token(TokenType.T_ASTRK))
 				self.advance()
 			elif self.current_char == '[':
 				link_text, url = self._make_link()
@@ -105,9 +111,10 @@ class Lexer():
 				self.tokens.append(alt_text)
 				self.tokens.append(image_link)
 				self.advance()
-			elif self.current_char == '*':
-				self.tokens.append(Token(TokenType.T_ASTRK))
-				self.advance()
+			elif self.current_char == '`':
+				self.tokens.append(self._make_code())
+			elif self.current_char == '-':
+				self.tokens.append(self._make_hr())
 			elif self.current_char in Lexer.TEXT_CHARS:
 				text_tok = self._make_text()
 				if text_tok.value:
@@ -117,8 +124,30 @@ class Lexer():
 
 		return self.tokens
 
+	def _make_hr(self) -> Token:
+		"""Returns a horizontal rule token if there are 3 or more dashes and the line ends, else, returns a text token."""
+		dash_count = 0
+		while self.current_char == '-' and self.not_newline:  # while still reading dashes
+			dash_count += 1
+			self.advance()
+
+		if dash_count >= 3:
+			return Token(TokenType.T_HR)
+
+	def _make_code(self) -> Token:
+		"""Returns a code token, TODO: returns inline code token at the moment."""
+		code = ""  # empty string to store code
+		self.advance()  # skip ` character
+		while self.current_char != '`':  # while still reading code
+			code += self.current_char
+			self.advance()
+
+		self.advance()  # skip ` character again
+
+		return Token(TokenType.T_INLINE_CODE, code)
+
 	def _make_heading(self) -> Token:
-		"""Returns a heading token (h1, h2 etc.)."""
+		"""Returns a heading token"""
 		hash_tag_count = 0  # keeps track of hash tags.
 		while self.current_char == '#' and hash_tag_count != 6:
 			hash_tag_count += 1
@@ -126,7 +155,7 @@ class Lexer():
 		token_type = TokenType['T_H' + str(hash_tag_count)]  # determine heading tag
 
 		heading_text = ""
-		while self.current_char != '\n':  # while still parsing the same line as the heading
+		while self.current_char and self.not_newline:  # while still parsing the same line as the heading
 			heading_text += self.current_char
 			self.advance()
 
@@ -146,17 +175,20 @@ class Lexer():
 		# Read the link text.
 		link_text = ""
 		self.advance()  # skip [ character
-		while self.current_char != ']':
+		while self.current_char != ']' and self.not_newline:
 			link_text += self.current_char
 			self.advance()
 
-		# Skip [ and ) characters.
-		self.advance()
-		self.advance()
+		# Skip ] and ( characters.
+		if self.current_char == ']':
+			self.advance()
+
+		if self.current_char == '(':
+			self.advance()
 
 		# Read the URL.
 		url = ""
-		while self.current_char != ')':
+		while self.current_char != ')' and self.not_newline:
 			url += self.current_char
 			self.advance()
 
@@ -167,18 +199,23 @@ class Lexer():
 		alt_text = ""
 		# Skip ! and [ characters.
 		self.advance()
-		self.advance()
-		while self.current_char != ']':
+		if self.current_char == '[':
+			self.advance()
+
+		while self.current_char != ']' and self.not_newline:
 			alt_text += self.current_char
 			self.advance()
 
-		# Skip [ and ) characters.
-		self.advance()
-		self.advance()
+		# Skip ] and ( characters.
+		if self.current_char == ']':
+			self.advance()
+
+		if self.current_char == '(':
+			self.advance()
 
 		# Read the URL.
 		image_link = ""
-		while self.current_char != ')':
+		while self.current_char != ')' and self.not_newline:
 			image_link += self.current_char
 			self.advance()
 
