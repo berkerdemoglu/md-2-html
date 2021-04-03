@@ -1,10 +1,9 @@
-from converter import MD2HTMLConverter
+from file_selector import FileSelectorApp
 
 
 def main():
-    filename = "../resources/document.md"
-    with MD2HTMLConverter(filename, False) as converter:
-        print(converter.parser.html)
+    app = FileSelectorApp()
+    app.start_app()
 
 
 if __name__ == '__main__':
