@@ -10,7 +10,7 @@ BG_COLOR = "#282c34"
 FG_COLOR = "#abb2bf"
 
 
-class FileSelectorApp():
+class GUIApp():
 	"""A class that allows the user to select a markdown file to convert."""
 
 	def __init__(self):

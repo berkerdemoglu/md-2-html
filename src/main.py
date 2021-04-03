@@ -1,8 +1,8 @@
-from file_selector import FileSelectorApp
+from gui import GUIApp
 
 
 def main():
-    app = FileSelectorApp()
+    app = GUIApp()
     app.start_app()
 
 
