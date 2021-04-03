@@ -2,7 +2,8 @@ from md_parser import Parser
 from html_tag import HtmlTag, VoidHtmlTag
 import webbrowser
 import os
-from accessify import private
+
+from typing import NoReturn, Tuple
 
 
 class MD2HTMLConverter():
@@ -17,9 +18,8 @@ class MD2HTMLConverter():
 
 		self.parser = Parser(filename)
 
-	@private
 	@staticmethod
-	def _generate_css():
+	def _generate_css() -> Tuple[VoidHtmlTag, VoidHtmlTag]:
 		"""Generates CSS styling for the generated .html file."""
 		bootstrap = "https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css"
 		css_bootstrap = VoidHtmlTag('link', attributes={'rel': 'stylesheet', 'href': bootstrap})
@@ -28,8 +28,7 @@ class MD2HTMLConverter():
 
 		return css_bootstrap, css_styles
 
-	@private
-	def _generate_head(self):
+	def _generate_head(self) -> NoReturn:
 		"""Generates the head tag."""
 		head = HtmlTag('head')
 		# Add meta tags.
@@ -44,21 +43,22 @@ class MD2HTMLConverter():
 
 		self.parser.html.add(head)
 
-	@private
-	def _generate_body(self):
+	def _generate_body(self) -> NoReturn:
 		"""Creates body and the main div."""
 		body = HtmlTag('body')
 		body.add(self.parser.div)
 
 		self.parser.html.add(body)
 
-	def convert(self):
+	def convert(self) -> NoReturn:
+		"""Parses markdown and outputs in the form of an .html file."""
 		self._generate_head()
 		self._generate_body()
-		self.parser.make_tags()
+		self.parser.parse()
 		with open(self.html_filename, 'w') as f:
 			f.write(str(self.parser.html))
 
+	# Context Manager Magic Methods
 	def __enter__(self):
 		self.convert()
 		return self

@@ -2,4 +2,7 @@
 
 ## Quandoquidem sit nectare toto Iano mea ambobus
 
-*****bruh****
+*
+[pica](https://nodeca.github.io/pica/demo/)
+![Minion](https://octodex.github.com/images/minion.png)
+`bruhhhh`
