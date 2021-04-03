@@ -2,6 +2,7 @@ import os
 
 from tkinter import *
 from tkinter import filedialog
+from tkinter import messagebox
 
 from converter import MD2HTMLConverter
 
@@ -23,6 +24,9 @@ class GUIApp():
 		self.root.configure(bg=BG_COLOR)
 		self.root.resizable(False, False)
 
+		# Initialize a variable to store the file name.
+		self.filename = ''
+
 		# Make a heading label.
 		self.heading_label = Label(self.root, text='md-2-html', font=('Segoe UI', 24), bg=BG_COLOR, fg=FG_COLOR)
 
@@ -33,7 +37,7 @@ class GUIApp():
 		# Make a button that opens the file selecting menu and a label that shows the file selected.
 		self.file_button = Button(self.converter_frame, text='Select File', padx=5, pady=5, command=self.choose_file_cmd,
 				font=FONT, bg=BG_COLOR, fg=FG_COLOR)
-		self.selected_file_label = Label(self.converter_frame, text='Selected File: None', font=FONT, bg=BG_COLOR, fg=FG_COLOR)
+		self.selected_file_label = Label(self.converter_frame, text='No file selected', font=FONT, bg=BG_COLOR, fg=FG_COLOR)
 
 		# Make a convert button.
 		self.convert_button = Button(self.converter_frame, text='Convert', padx=5, pady=5, state='disabled',
@@ -77,19 +81,32 @@ class GUIApp():
 	def choose_file_cmd(self):
 		"""Open a file dialog that allows the user to select a file to convert."""
 		# Open file dialog.
-		self.root.filename = filedialog.askopenfilename(initialdir=os.path.join(os.environ['USERPROFILE'], 'Desktop'),
+		self.filename = filedialog.askopenfilename(initialdir=os.path.join(os.environ['USERPROFILE'], 'Desktop'),
 				title='Select a Markdown File', filetypes=(('Markdown Files', '*.md'), ('All Files', '*.*')))
 
 		# Update labels.
-		self.selected_file_label['text'] = f'Selected File: {os.path.basename(self.root.filename)}'
-		self.convert_button['state'] = 'normal'
+		if '.md' not in os.path.basename(self.filename):
+			messagebox.showerror('Error', 'Please select a Markdown file.')
+		else:  # if a .md file has been selected
+			self.selected_file_label['text'] = f'Selected File: {os.path.basename(self.filename)}'
+			self.convert_button['state'] = 'normal'
 
 	def convert_cmd(self):
 		"""Convert the selected Markdown file to a HTML file."""
 		open_browser = True if self.open_browser else False
+		try:
+			with MD2HTMLConverter(self.filename, open_browser) as converter:
+				print(converter.parser.html)
+		except:
+			# Inform the user of an error's occurrence.
+			messagebox.showerror('Error', 'An error occurred.')
+		else:
+			# Inform the user of success
+			messagebox.showinfo('Success', 'Successfully converted to HTML!')
 
-		with MD2HTMLConverter(self.root.filename, open_browser) as converter:
-			print(converter.parser.html)
+		# Reset convert button.
+		self.selected_file_label['text'] = f'No file selected'
+		self.convert_button['state'] = 'disabled'
 
 	def reset_options(self):
 		"""Deselect all radio buttons in the options frame."""
