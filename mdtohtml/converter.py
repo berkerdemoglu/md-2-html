@@ -1,5 +1,6 @@
-from md_parser import Parser
-from html_tag import HtmlTag, VoidHtmlTag
+from mdtohtml.md_parser import Parser
+from mdtohtml.html_tag import HtmlTag, VoidHtmlTag
+from mdtohtml import resources_path
 import webbrowser
 import os
 
@@ -65,5 +66,4 @@ class MD2HTMLConverter():
 
 	def __exit__(self, exc_type, exc_val, exc_tb):
 		if self.open_browser:
-			os.chdir('..')
-			webbrowser.open('file:///' + os.getcwd() + '/resources/document.html')
+			webbrowser.open(resources_path.as_uri() + '/document.html')

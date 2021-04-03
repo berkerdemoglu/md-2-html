@@ -3,7 +3,8 @@ import os
 from tkinter import *
 from tkinter import filedialog
 
-from converter import MD2HTMLConverter
+from mdtohtml.converter import MD2HTMLConverter
+from mdtohtml import assets_path
 
 FONT = ('Segoe UI', 13)
 BG_COLOR = "#282c34"
@@ -18,7 +19,11 @@ class GUIApp():
 		# Initialize root and its attributes.
 		self.root = Tk()
 		self.root.title('md-2-html')
-		self.root.iconbitmap('../assets/icon.ico')
+		# tkinter only supports ico on windows
+		if os.name == 'nt':
+			self.root.iconbitmap(assets_path/'icon.ico')
+		else:
+			self.root.iconbitmap(os.path.join('@'+str(assets_path),'icon.xbm'))
 		self.root.geometry('720x540')  # 4:3 ratio
 		self.root.configure(bg=BG_COLOR)
 		self.root.resizable(False, False)
