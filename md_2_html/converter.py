@@ -1,6 +1,6 @@
-from mdtohtml.md_parser import Parser
-from mdtohtml.html_tag import HtmlTag, VoidHtmlTag
-from mdtohtml import resources_path
+from md_2_html.md_parser import Parser
+from md_2_html.html_tag import HtmlTag, VoidHtmlTag
+from md_2_html import resources_path
 import webbrowser
 import os
 

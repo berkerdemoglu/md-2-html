@@ -4,8 +4,8 @@ from tkinter import *
 from tkinter import filedialog
 from tkinter import messagebox
 
-from mdtohtml.converter import MD2HTMLConverter
-from mdtohtml import assets_path
+from md_2_html.converter import MD2HTMLConverter
+from md_2_html import assets_path
 
 FONT = ('Segoe UI', 13)
 BG_COLOR = "#282c34"

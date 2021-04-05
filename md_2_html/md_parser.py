@@ -1,5 +1,5 @@
-from mdtohtml.html_tag import HtmlTag, VoidHtmlTag
-from mdtohtml.lexer import Lexer
+from md_2_html.html_tag import HtmlTag, VoidHtmlTag
+from md_2_html.lexer import Lexer
 
 
 class Parser():

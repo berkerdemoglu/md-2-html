@@ -1,4 +1,4 @@
-from mdtohtml.gui import GUIApp
+from md_2_html.gui import GUIApp
 
 
 def main():
