@@ -3,6 +3,8 @@ name = "md-2-html"
 version = "0.1.0"
 description = ""
 authors = ["Your Name <you@example.com>"]
+# include static files
+include = ["md_2_html/assets/*", "md_2_html/resources/*"]
 
 [tool.poetry.dependencies]
 python = "^3.8"
