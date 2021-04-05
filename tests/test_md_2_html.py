@@ -1,4 +1,4 @@
-from mdtohtml import __version__
+from md_2_html import __version__
 
 
 def test_version():
