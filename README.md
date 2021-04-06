@@ -7,5 +7,5 @@
 > Markdown to HTML converter built in Python.
 
 Here's the app where you select your Markdown file and convert it to HTML.
-![GUI Screenshot](https://raw.githubusercontent.com/berkerdemoglu/md-2-html/master/assets/gui_screenshot.png)
+![GUI Screenshot](https://raw.githubusercontent.com/berkerdemoglu/md-2-html/master/md_2_html/assets/gui_screenshot.png)
 Keep in mind that *md-2-html* is still in development, so that means new features will be added to GUI as we go on.
