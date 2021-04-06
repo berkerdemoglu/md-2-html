@@ -4,7 +4,12 @@ from tkinter import *
 from tkinter import filedialog
 from tkinter import messagebox
 
-from converter import MD2HTMLConverter
+from md_2_html.converter import MD2HTMLConverter
+from md_2_html import assets_path
+
+__all__ = [
+	"GUIApp"
+]
 
 FONT = ('Segoe UI', 13)
 BG_COLOR = "#282c34"
@@ -19,7 +24,11 @@ class GUIApp():
 		# Initialize root and its attributes.
 		self.root = Tk()
 		self.root.title('md-2-html')
-		self.root.iconbitmap('../assets/icon.ico')
+		# tkinter only supports ico on windows
+		if os.name == 'nt':
+			self.root.iconbitmap(assets_path/'icon.ico')
+		else:
+			self.root.iconbitmap(os.path.join('@'+str(assets_path),'icon.xbm'))
 		self.root.geometry('720x540')  # 4:3 ratio
 		self.root.configure(bg=BG_COLOR)
 		self.root.resizable(False, False)
@@ -81,7 +90,7 @@ class GUIApp():
 	def choose_file_cmd(self):
 		"""Open a file dialog that allows the user to select a file to convert."""
 		# Open file dialog.
-		self.filename = filedialog.askopenfilename(initialdir=os.path.join(os.environ['USERPROFILE'], 'Desktop'),
+		self.filename = filedialog.askopenfilename(initialdir=os.path.join(os.path.expanduser('~'), 'Desktop'),
 				title='Select a Markdown File', filetypes=(('Markdown Files', '*.md'), ('All Files', '*.*')))
 
 		# Update labels.
